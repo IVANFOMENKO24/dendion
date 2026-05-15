@@ -1,0 +1,6 @@
+flask
+flask-socketio
+pyTelegramBotAPI
+eventlet
+gunicorn
+requests
