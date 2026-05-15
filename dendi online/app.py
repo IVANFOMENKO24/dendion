@@ -1,5 +1,5 @@
-import eventlet
-eventlet.monkey_patch() # Это ДОЛЖНО быть на первой строке
+import gevent.monkey
+gevent.monkey.patch_all() # Новая заплатка для gevent
 
 import os
 from flask import Flask, render_template, send_from_directory, request, jsonify
@@ -15,7 +15,8 @@ app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-socketio = SocketIO(app, cors_allowed_origins="*", max_http_buffer_size=20000000, async_mode='eventlet')
+# Указываем async_mode='gevent'
+socketio = SocketIO(app, cors_allowed_origins="*", max_http_buffer_size=20000000, async_mode='gevent')
 
 BOT_TOKEN = '8798187369:AAFGRXMMvElulTGtuhePUmp5QAEuZAK7ALs'
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -28,7 +29,6 @@ def run_bot():
     except Exception as e:
         print(f"Bot error: {e}")
 
-# Запуск бота
 bot_thread = Thread(target=run_bot)
 bot_thread.daemon = True
 bot_thread.start()
@@ -84,7 +84,7 @@ def on_request_sync(data):
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    bot.reply_to(message, "🎮 Привет! Это бот для игры в Денди онлайн. Открой сайт игры и начни играть!")
+    bot.reply_to(message, "🎮 Бот запущен на сервере! Открой сайт и начни играть.")
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
